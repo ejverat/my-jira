@@ -166,14 +166,12 @@ pub mod test_utils {
 
     impl Database for MockDB {
         fn read_db(&self) -> Result<DBState> {
-            // TODO: fix this error by deriving the appropriate traits for Story
             let state = self.last_written_state.borrow().clone();
             Ok(state)
         }
 
         fn write_db(&self, db_state: &DBState) -> Result<()> {
             let latest_state = &self.last_written_state;
-            // TODO: fix this error by deriving the appropriate traits for DBState
             *latest_state.borrow_mut() = db_state.clone();
             Ok(())
         }
@@ -232,7 +230,6 @@ mod tests {
 
         let epic_id = result.unwrap();
 
-        // TODO: fix this error by deriving the appropriate traits for Story
         let result = db.create_story(story.clone(), epic_id);
         assert_eq!(result.is_ok(), true);
 
