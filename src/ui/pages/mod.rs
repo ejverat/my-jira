@@ -74,19 +74,27 @@ impl Page for EpicDetail {
         println!("------------------------------ EPIC ------------------------------");
         println!("  id  |     name     |         description         |    status    ");
 
-        // TODO: print out epic details using get_column_string()
-
-        println!();
+        println!(
+            "{}|{}|{}|{}",
+            get_column_string(format!("{}", self.epic_id).as_str(), 6),
+            get_column_string(epic.name.as_str(), 14),
+            get_column_string(epic.description.as_str(), 29),
+            get_column_string(format!("{}", epic.status).as_str(), 14)
+        );
 
         println!("---------------------------- STORIES ----------------------------");
         println!("     id     |               name               |      status      ");
 
         let stories = &db_state.stories;
 
-        // TODO: print out stories using get_column_string(). also make sure the stories are sorted by id
-
-        println!();
-        println!();
+        for story in stories {
+            println!(
+                "{}|{}|{}",
+                get_column_string(format!("{}", story.0).as_str(), 12),
+                get_column_string(story.1.name.as_str(), 34),
+                get_column_string(format!("{}", story.1.status).as_str(), 18)
+            );
+        }
 
         println!(
             "[p] previous | [u] update epic | [d] delete epic | [c] create story | [:id:] navigate to story"
@@ -96,7 +104,28 @@ impl Page for EpicDetail {
     }
 
     fn handle_input(&self, input: &str) -> Result<Option<Action>> {
-        todo!() // match against the user input and return the corresponding action. If the user input was invalid return None.
+        match input {
+            "p" => Ok(Some(Action::NavigateToPreviousPage)),
+            "u" => Ok(Some(Action::UpdateEpicStatus {
+                epic_id: self.epic_id,
+            })),
+            "d" => Ok(Some(Action::DeleteEpic {
+                epic_id: self.epic_id,
+            })),
+            "c" => Ok(Some(Action::CreateStory {
+                epic_id: self.epic_id,
+            })),
+            _ => {
+                if let Ok(story_id) = input.parse::<u32>() {
+                    Ok(Some(Action::NavigateToStoryDetail {
+                        epic_id: self.epic_id,
+                        story_id,
+                    }))
+                } else {
+                    Err(anyhow!("Invalid input"))
+                }
+            }
+        }
     }
 }
 
