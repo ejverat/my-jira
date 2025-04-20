@@ -45,13 +45,18 @@ impl Page for HomePage {
 
     fn handle_input(&self, input: &str) -> Result<Option<Action>> {
         match input {
+            "" => Ok(None),
             "q" => Ok(Some(Action::Exit)),
             "c" => Ok(Some(Action::CreateEpic)),
             _ => {
                 if let Ok(id) = input.parse::<u32>() {
-                    Ok(Some(Action::NavigateToEpicDetail { epic_id: id }))
+                    if self.db.read_db()?.epics.contains_key(&id) {
+                        Ok(Some(Action::NavigateToEpicDetail { epic_id: id }))
+                    } else {
+                        Ok(None)
+                    }
                 } else {
-                    Err(anyhow!("Invalid input"))
+                    Ok(None)
                 }
             }
         }
@@ -105,6 +110,7 @@ impl Page for EpicDetail {
 
     fn handle_input(&self, input: &str) -> Result<Option<Action>> {
         match input {
+            "" => Ok(None),
             "p" => Ok(Some(Action::NavigateToPreviousPage)),
             "u" => Ok(Some(Action::UpdateEpicStatus {
                 epic_id: self.epic_id,
@@ -117,12 +123,16 @@ impl Page for EpicDetail {
             })),
             _ => {
                 if let Ok(story_id) = input.parse::<u32>() {
-                    Ok(Some(Action::NavigateToStoryDetail {
-                        epic_id: self.epic_id,
-                        story_id,
-                    }))
+                    if self.db.read_db()?.stories.contains_key(&story_id) {
+                        Ok(Some(Action::NavigateToStoryDetail {
+                            epic_id: self.epic_id,
+                            story_id,
+                        }))
+                    } else {
+                        Ok(None)
+                    }
                 } else {
-                    Err(anyhow!("Invalid input"))
+                    Ok(None)
                 }
             }
         }
