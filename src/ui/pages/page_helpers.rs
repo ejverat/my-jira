@@ -1,7 +1,16 @@
 use ellipse::Ellipse;
 
 pub fn get_column_string(text: &str, width: usize) -> String {
-    todo!() // use the truncate_ellipse function from the ellipse crate
+    match width {
+        0 => "".to_owned(),
+        1..=3 => format!("{:.<width$}", "."),
+        _ if text.len() < width => format!("{:width$}", text),
+        _ if text.len() == width => text.to_owned(),
+        _ => {
+            let truncated_text = &text[0..width];
+            truncated_text.truncate_ellipse(width - 3).to_string()
+        }
+    }
 }
 
 #[cfg(test)]
