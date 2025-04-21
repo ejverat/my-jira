@@ -65,6 +65,9 @@ impl Navigator {
                     self.db
                         .delete_epic(epic_id)
                         .with_context(|| format!("Failed to delete epic with id {epic_id}"))?;
+                    if !self.pages.is_empty() {
+                        self.pages.pop();
+                    }
                 }
             }
             Action::CreateStory { epic_id } => {
@@ -91,6 +94,9 @@ impl Navigator {
                             "Failed to delete story with id {story_id} for epic with if {epic_id}"
                         )
                     })?;
+                    if !self.pages.is_empty() {
+                        self.pages.pop();
+                    }
                 }
             }
             Action::Exit => {
